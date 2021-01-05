@@ -22,8 +22,8 @@ environment:
 #     git checkout -qf FETCH_HEAD
 # }
 
-# init:
-# - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+init:
+- ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 install:
   # Submodules are added in install
@@ -34,29 +34,29 @@ install:
   # Fix for https://github.com/msys2/MSYS2-packages/issues/1884#issuecomment-702878590
   # https://stackoverflow.com/q/37627248/4166604
   # https://www.msys2.org/news/#2020-05-31-update-fails-with-could-not-open-file
-  - >-
-    C:\msys64\usr\bin\bash -lc "
-    cd /tmp;
-    for server in $(grep $'\x5eServer' /etc/pacman.d/mirrorlist.msys | awk '{print $3}' | shuf | arch=x86_64 /usr/bin/envsubst); do
-    :;  echo Trying ${server};
-    :;  curl --connect-timeout 10 -LO ${server}msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz && break;
-    done"
-  - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -U --config <(echo) /tmp/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
-  # Update the db and mirrors
-  - C:\msys64\usr\bin\bash -lc "pacman --needed --noconfirm -Sy pacman-mirrors"
-  # Hack for https://github.com/msys2/MSYS2-packages/issues/2300
-  - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -U https://repo.msys2.org/msys/x86_64/zstd-1.4.7-1-x86_64.pkg.tar.xz"
-  - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -U https://repo.msys2.org/msys/x86_64/pacman-5.2.2-5-x86_64.pkg.tar.xz"
-  # Update the db again, since we just got new mirrors, and then update pacman (again)
-  - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Sydd pacman"
+  # - >-
+  #   C:\msys64\usr\bin\bash -lc "
+  #   cd /tmp;
+  #   for server in $(grep $'\x5eServer' /etc/pacman.d/mirrorlist.msys | awk '{print $3}' | shuf | arch=x86_64 /usr/bin/envsubst); do
+  #   :;  echo Trying ${server};
+  #   :;  curl --connect-timeout 10 -LO ${server}msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz && break;
+  #   done"
+  # - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -U --config <(echo) /tmp/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
+  # # Update the db and mirrors
+  # - C:\msys64\usr\bin\bash -lc "  "
+  # # Hack for https://github.com/msys2/MSYS2-packages/issues/2300
+  # - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -U https://repo.msys2.org/msys/x86_64/zstd-1.4.7-1-x86_64.pkg.tar.xz"
+  # - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -U https://repo.msys2.org/msys/x86_64/pacman-5.2.2-5-x86_64.pkg.tar.xz"
+  # # Update the db again, since we just got new mirrors, and then update pacman (again)
+  # - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Sydd pacman"
 
-  # This is too late to install rank mirrors to make it worth it
-  # Plus, rankmirrors doesn't appear to work
-  # - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -S pacman-contrib"
+  # # This is too late to install rank mirrors to make it worth it
+  # # Plus, rankmirrors doesn't appear to work
+  # # - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -S pacman-contrib"
 
-  # additional packages for test. This has to be a separate call from the pacman
-  # install, due to pacman supporting a newer zip format
-  - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -S unzip"
+  # # additional packages for test. This has to be a separate call from the pacman
+  # # install, due to pacman supporting a newer zip format
+  # - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -S unzip"
 
   # debugging outputs
   - C:\msys64\usr\bin\bash -lc "cat ~/.bashrc"
@@ -80,5 +80,5 @@ test_script:
   # - bash -lc "exec 0</dev/null && cd $APPVEYOR_BUILD_FOLDER && source setup.env && just test int_appveyor"
   # Appveyor only has Docker with linux containers in closed beta/"Premium" service :()
 
-# on_finish:
-#   - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+on_finish:
+  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
